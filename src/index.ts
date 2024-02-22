@@ -1,13 +1,13 @@
 import { predicate } from './filter.js';
 import { parse, type Expr, type TargetTypes } from './syntax.js';
 
-export function buildEvaluator(
+export function buildEvaluator<T>(
   targetTypes: TargetTypes,
-  targetGetter: (data: any, field: string, expr: Expr) => any = (data, field) =>
-    data[field],
-): (query: string) => (item: any) => boolean {
+  targetGetter: (data: T, field: string, expr: Expr) => any = (data, field) =>
+    (data as any)[field],
+): (query: string) => (item: T) => boolean {
   return (query) => {
     const expr = parse(query, targetTypes);
     return (item) => predicate(item, expr, targetGetter);
-  }
+  };
 }
