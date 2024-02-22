@@ -1,0 +1,21 @@
+{
+  "name": "quist",
+  "version": "0.1.0",
+  "description": "Queries, fast, simple, robust.",
+  "license": "MIT",
+  "module": "dist/index.js",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "^1.0.6",
+    "@typescript-eslint/eslint-plugin": "^7.0.1",
+    "@typescript-eslint/parser": "^7.0.1",
+    "eslint": "^8.56.0",
+    "eslint-config-jc": "^4.3.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-n": "^16.6.2",
+    "eslint-plugin-regexp": "^2.2.0",
+    "prettier": "^3.2.5",
+    "tsconfig-jc": "^2.3.1",
+    "typescript": "~5.3.3"
+  }
+}

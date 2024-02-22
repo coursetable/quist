@@ -1,0 +1,169 @@
+// Bun Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`parse 1`] = `
+{
+  "operands": [
+    {
+      "operands": [
+        {
+          "operator": "in",
+          "target": "subject",
+          "type": "CategoricalOp",
+          "value": [
+            "MATH",
+            "CPSC",
+            "S&DS",
+          ],
+        },
+        {
+          "operators": [
+            "<=",
+            "<",
+          ],
+          "target": "number",
+          "type": "CompoundNumericOp",
+          "values": [
+            300,
+            500,
+          ],
+        },
+        {
+          "operand": {
+            "operator": "has-any-of",
+            "target": "professors",
+            "type": "SetOp",
+            "value": [
+              "Alan Weide",
+              "Ozan Erat",
+            ],
+          },
+          "type": "NotExpr",
+        },
+      ],
+      "operator": "AND",
+      "type": "ComplexExpr",
+    },
+    {
+      "operator": "is",
+      "target": "fysem",
+      "type": "BooleanOp",
+    },
+  ],
+  "operator": "OR",
+  "type": "ComplexExpr",
+}
+`;
+
+exports[`parse 2`] = `
+{
+  "operands": [
+    {
+      "operator": "contains",
+      "target": "*",
+      "type": "TextOp",
+      "value": "Hello",
+    },
+    {
+      "operator": "contains",
+      "target": "*",
+      "type": "TextOp",
+      "value": "world",
+    },
+  ],
+  "operator": "AND",
+  "type": "ComplexExpr",
+}
+`;
+
+exports[`parse 3`] = `
+{
+  "operands": [
+    {
+      "operator": "contains",
+      "target": "*",
+      "type": "TextOp",
+      "value": "subject:has",
+    },
+    {
+      "operator": "contains",
+      "target": "*",
+      "type": "TextOp",
+      "value": "MATH",
+    },
+  ],
+  "operator": "AND",
+  "type": "ComplexExpr",
+}
+`;
+
+exports[`parse 4`] = `
+{
+  "operands": [
+    {
+      "operator": "contains",
+      "target": "*",
+      "type": "TextOp",
+      "value": "fysem:is",
+    },
+    {
+      "operator": "contains",
+      "target": "*",
+      "type": "TextOp",
+      "value": "x",
+    },
+  ],
+  "operator": "AND",
+  "type": "ComplexExpr",
+}
+`;
+
+exports[`parse 5`] = `
+{
+  "operands": [
+    {
+      "operator": "contains",
+      "target": "*",
+      "type": "TextOp",
+      "value": ""quote",
+    },
+  ],
+  "operator": "AND",
+  "type": "ComplexExpr",
+}
+`;
+
+exports[`parse 6`] = `
+{
+  "operands": [
+    {
+      "operator": "contains",
+      "target": "*",
+      "type": "TextOp",
+      "value": "CPSC",
+    },
+    {
+      "operator": "contains",
+      "target": "*",
+      "type": "TextOp",
+      "value": "223",
+    },
+  ],
+  "operator": "AND",
+  "type": "ComplexExpr",
+}
+`;
+
+exports[`parse 7`] = `
+{
+  "operands": [
+    {
+      "operator": "contains",
+      "target": "*",
+      "type": "TextOp",
+      "value": "WLH",
+    },
+  ],
+  "operator": "AND",
+  "type": "ComplexExpr",
+}
+`;

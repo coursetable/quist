@@ -1,0 +1,8 @@
+{
+  "extends": "tsconfig-jc",
+  "compilerOptions": {
+    "module": "node16",
+    "outDir": "dist",
+  },
+  "include": ["./**/*", "./.eslintrc.js"]
+}
