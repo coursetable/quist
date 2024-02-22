@@ -1,6 +1,6 @@
 {
   "name": "quist",
-  "version": "0.1.1",
+  "version": "0.1.3",
   "description": "Queries, fast, simple, robust.",
   "license": "MIT",
   "module": "dist/index.js",

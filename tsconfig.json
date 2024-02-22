@@ -2,7 +2,10 @@
   "extends": "tsconfig-jc",
   "compilerOptions": {
     "module": "node16",
+    "declaration": true,
+    "declarationMap": true,
     "outDir": "dist",
   },
-  "include": ["./**/*", "./.eslintrc.js"]
+  "include": ["./src/**/*"],
+  "exclude": ["**/*.test.ts"],
 }
