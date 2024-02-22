@@ -85,7 +85,7 @@ interface BooleanOp {
   operator: 'is' | 'not';
 }
 
-export interface TextOp {
+interface TextOp {
   type: 'TextOp';
   target: string;
   operator: 'contains' | 'contains-words' | 'matches';
@@ -104,7 +104,7 @@ export type Expr =
   | BooleanOp
   | TextOp;
 
-type TargetTypes = {
+export type TargetTypes = {
   boolean: Set<string>;
   set: Set<string>;
   categorical: Set<string>;
@@ -117,8 +117,8 @@ const tokenRegex = new RegExp(
     .map((t) =>
       t instanceof RegExp
         ? t.source
-        // Regex escape
-        : `(${t.replaceAll(/[()[\]{}*+?/$.|\-^\\]/gu, '\\$&')})`,
+        : // Regex escape
+          `(${t.replaceAll(/[()[\]{}*+?/$.|\-^\\]/gu, '\\$&')})`,
     )
     .join('|'),
   'u',
@@ -364,11 +364,9 @@ function parseExpr(
   ];
 }
 
-export function parse(
-  input: string,
-  targetTypes: TargetTypes,
-): [Expr | undefined, boolean] {
+export function parse(input: string, targetTypes: TargetTypes): Expr {
   const tokens = tokenize(input);
   const [expr, index] = parseComplexExpr(tokens, 0, targetTypes);
-  return [expr, index === tokens.length];
+  if (!expr || index !== tokens.length) throw new Error('Invalid expression');
+  return expr;
 }

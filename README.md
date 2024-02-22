@@ -121,10 +121,12 @@ Also, any token that does not belong to a query is implicitly part of `*:contain
 
 ## Using the API
 
-We have two APIs: `parse` and `toPredicate`. `parse` takes a string and a record of field types, and returns a parsed query object. `toPredicate` takes a query object and a `targetGetter` callback, and returns a predicate function representing the query. The `targetGetter` is optional and defaults to simply `(data, field) => data[field]`. **This means that by default it does not support the `*` query.**
+We have a single API: `buildEvaluator`. First, it takes to parameters describing your intended JSON shape: `targetTypes` and `targetGetter`. `targetTypes` defines the type of each field, and queries containing unrecognized fields or fields with wrong types will become plain text. `targetGetter` defines how to map field names in queries to actual values in the JSON. By default, it uses `(data, field) => data[field]`, but you can customize this logic. **By default, it does not support the `*` query.** You must explicitly define what it means in `targetGetter`.
+
+`buildEvaluator` returns a query evaluator, which is a function that takes a query string and returns a _predicate_. This predicate is a function that takes a target value and returns a boolean indicating whether the target value satisfies the query.
 
 ```js
-import { parse, toPredicate } from 'quist';
+import { buildEvaluator } from 'quist';
 
 const targetTypes = {
   boolean: new Set(['fysem', 'grad']),
@@ -144,9 +146,16 @@ const targetGetter = (data, field, expr) => {
   return target[field];
 };
 
-const query = parse(
+const evaluator = buildEvaluator(targetTypes, targetGetter);
+const predicate = evaluator(
   '(subject:in MATH, CPSC, S&DS AND 300<=number<500 AND NOT professor-names:has-any-of "Bruce Wayne", "Tony Stark") OR is:fysem',
-  targetTypes,
 );
-const predicate = toPredicate(query, targetGetter);
+console.log(
+  predicate({
+    subject: 'MATH',
+    number: 350,
+    professors: [{ name: 'Peter Parker' }],
+    fysem: true,
+  }),
+); // true
 ```
