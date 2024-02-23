@@ -19,97 +19,106 @@ const textOperators = ['contains-words', 'contains', 'matches'] as const;
 const orderingOperators = ['<', '<=', '>', '>=', '=', '!='] as const;
 const equalityOperators = ['=', '!='] as const;
 
-function oneOf<A extends readonly string[]>(
-  accepted: A,
+function oneOf<T extends string>(accepted: Set<T>, key: unknown): key is T;
+function oneOf<T extends string>(
+  accepted: readonly T[],
   key: unknown,
-): key is A[number] {
-  return accepted.includes(key as A[number]);
+): key is T;
+function oneOf(accepted: readonly string[] | Set<string>, key: unknown) {
+  if (accepted instanceof Set) return accepted.has(key as string);
+  return accepted.includes(key as string);
 }
 
-interface ComplexExpr {
+interface ComplexExpr<Types extends TargetTypes> {
   type: 'ComplexExpr';
   operator: 'AND' | 'OR';
-  operands: Expr[];
+  operands: Expr<Types>[];
 }
 
-interface NotExpr {
+interface NotExpr<Types extends TargetTypes> {
   type: 'NotExpr';
-  operand: Expr;
+  operand: Expr<Types>;
 }
 
-interface NumericOp {
+interface NumericOp<N extends string> {
   type: 'NumericOp';
-  target: string;
+  target: N;
   operator: '<' | '<=' | '>' | '>=' | '=' | '!=';
   value: number;
 }
 
-interface CompoundNumericOp {
+interface CompoundNumericOp<N extends string> {
   type: 'CompoundNumericOp';
-  target: string;
+  target: N;
   operators: ['<' | '<=', '<' | '<='] | ['>' | '>=', '>' | '>='];
   values: [number, number];
 }
 
-interface CategoricalIsOp {
+interface CategoricalIsOp<N extends string> {
   type: 'CategoricalOp';
-  target: string;
+  target: N;
   operator: 'is';
   value: string;
 }
 
-interface CategoricalInOp {
+interface CategoricalInOp<N extends string> {
   type: 'CategoricalOp';
-  target: string;
+  target: N;
   operator: 'in';
   value: string[];
 }
 
-interface SetHasOp {
+interface SetHasOp<S extends string> {
   type: 'SetOp';
-  target: string;
+  target: S;
   operator: 'has';
   value: string;
 }
 
-interface SetCompoundOp {
+interface SetCompoundOp<S extends string> {
   type: 'SetOp';
-  target: string;
+  target: S;
   operator: 'has-all-of' | 'has-any-of' | 'all-in';
   value: string[];
 }
 
-interface BooleanOp {
+interface BooleanOp<B extends string> {
   type: 'BooleanOp';
-  target: string;
+  target: B;
   operator: 'is' | 'not';
 }
 
-interface TextOp {
+interface TextOp<T extends string> {
   type: 'TextOp';
-  target: string;
+  target: T | '*';
   operator: 'contains' | 'contains-words' | 'matches';
   value: string;
 }
 
-export type Expr =
-  | ComplexExpr
-  | NotExpr
-  | NumericOp
-  | CompoundNumericOp
-  | CategoricalIsOp
-  | CategoricalInOp
-  | SetHasOp
-  | SetCompoundOp
-  | BooleanOp
-  | TextOp;
+export type Expr<Types extends TargetTypes> =
+  | ComplexExpr<Types>
+  | NotExpr<Types>
+  | NumericOp<Types['numeric']>
+  | CompoundNumericOp<Types['numeric']>
+  | CategoricalIsOp<Types['categorical']>
+  | CategoricalInOp<Types['categorical']>
+  | SetHasOp<Types['set']>
+  | SetCompoundOp<Types['set']>
+  | BooleanOp<Types['boolean']>
+  | TextOp<Types['text']>;
 
-export type TargetTypes = {
-  boolean: Set<string>;
-  set: Set<string>;
-  categorical: Set<string>;
-  numeric: Set<string>;
-  text: Set<string>;
+export type TargetTypes<
+  B extends string = string,
+  S extends string = string,
+  C extends string = string,
+  N extends string = string,
+  T extends string = string,
+> = {
+  boolean: B;
+  set: S;
+  categorical: C;
+  numeric: N;
+  text: T;
 };
 
 const tokenRegex = new RegExp(
@@ -145,35 +154,39 @@ function tokenize(input: string): string[] {
   return input.split(tokenRegex).filter(Boolean);
 }
 
-function parseBooleanOp(
+function parseBooleanOp<B extends string>(
   tokens: string[],
   index: number,
-  booleanTargets: Set<string>,
-): [BooleanOp | undefined, number] {
+  booleanTargets: Set<B>,
+): [BooleanOp<B> | undefined, number] {
   const parsed = tokens[index]?.match(booleanOpRegex);
   if (!parsed) return [undefined, index];
   const [, operator, target] = parsed;
-  if (!oneOf(booleanOperators, operator) || !target) return [undefined, index];
-  if (!booleanTargets.has(target)) {
+  if (
+    !oneOf(booleanOperators, operator) ||
+    !target ||
+    !oneOf(booleanTargets, target)
+  )
     return [undefined, index];
-  }
   return [{ type: 'BooleanOp', target, operator }, index + 1];
 }
 
-function parseSetOp(
+function parseSetOp<S extends string>(
   tokens: string[],
   index: number,
-  setTargets: Set<string>,
-): [SetHasOp | SetCompoundOp | undefined, number] {
+  setTargets: Set<S>,
+): [SetHasOp<S> | SetCompoundOp<S> | undefined, number] {
   const parsed = tokens[index]?.match(setOpRegex);
   if (!parsed) return [undefined, index];
   const [, target, operator] = parsed;
-  if (!oneOf(setOperators, operator) || !target) return [undefined, index];
-  if (!setTargets.has(target)) {
-    return [undefined, index];
-  }
   const value = tokens[index + 1];
-  if (!value) return [undefined, index];
+  if (
+    !oneOf(setOperators, operator) ||
+    !target ||
+    !oneOf(setTargets, target) ||
+    !value
+  )
+    return [undefined, index];
   if (operator === 'has')
     return [{ type: 'SetOp', target, operator, value }, index + 2];
   const values = [value];
@@ -188,19 +201,22 @@ function parseSetOp(
   return [{ type: 'SetOp', target, operator, value: values }, index];
 }
 
-function parseCategoricalOp(
+function parseCategoricalOp<C extends string>(
   tokens: string[],
   index: number,
-  categoricalTargets: Set<string>,
-): [CategoricalIsOp | CategoricalInOp | undefined, number] {
+  categoricalTargets: Set<C>,
+): [CategoricalIsOp<C> | CategoricalInOp<C> | undefined, number] {
   const parsed = tokens[index]?.match(categoricalOpRegex);
   if (!parsed) return [undefined, index];
   const [, target, operator] = parsed;
-  if (!oneOf(categoricalOperators, operator) || !target)
-    return [undefined, index];
-  if (!categoricalTargets.has(target)) return [undefined, index];
   const value = tokens[index + 1];
-  if (!value) return [undefined, index];
+  if (
+    !oneOf(categoricalOperators, operator) ||
+    !target ||
+    !oneOf(categoricalTargets, target) ||
+    !value
+  )
+    return [undefined, index];
   if (operator === 'is')
     return [{ type: 'CategoricalOp', target, operator, value }, index + 2];
   const values = [value];
@@ -220,27 +236,29 @@ function parseCategoricalOp(
 
 const numberRegex = /^-?\d+(?:\.\d+)?$/u;
 
-function parseNumericOp(
+function parseNumericOp<N extends string>(
   tokens: string[],
   index: number,
-  numericTargets: Set<string>,
-): [NumericOp | CompoundNumericOp | undefined, number] {
+  numericTargets: Set<N>,
+): [NumericOp<N> | CompoundNumericOp<N> | undefined, number] {
   const first = tokens[index];
   if (!first) return [undefined, index];
   if (numberRegex.test(first)) {
     // Compound numeric op
     const operator = tokens[index + 1];
-    if (!oneOf(orderingOperators, operator)) return [undefined, index];
     const target = tokens[index + 2];
-    if (!target) return [undefined, index];
-    if (!numericTargets.has(target)) {
-      return [undefined, index];
-    }
     const secondOperator = tokens[index + 3];
-    if (!secondOperator || secondOperator[0] !== operator[0])
-      return [undefined, index];
     const second = tokens[index + 4];
-    if (!second || !numberRegex.test(second)) return [undefined, index];
+    if (
+      !oneOf(orderingOperators, operator) ||
+      !target ||
+      !oneOf(numericTargets, target) ||
+      !secondOperator ||
+      secondOperator[0] !== operator[0] ||
+      !second ||
+      !numberRegex.test(second)
+    )
+      return [undefined, index];
     return [
       {
         type: 'CompoundNumericOp',
@@ -252,53 +270,58 @@ function parseNumericOp(
     ];
   }
   // Single numeric op
-  if (!numericTargets.has(first)) return [undefined, index];
   const operator = tokens[index + 1];
-  if (!operator) return [undefined, index];
+  const value = tokens[index + 2];
   if (
-    !oneOf(equalityOperators, operator) &&
-    !oneOf(orderingOperators, operator)
+    !oneOf(numericTargets, first) ||
+    !operator ||
+    (!oneOf(equalityOperators, operator) &&
+      !oneOf(orderingOperators, operator)) ||
+    !value ||
+    !numberRegex.test(value)
   )
     return [undefined, index];
-  const value = tokens[index + 2];
-  if (!value || !numberRegex.test(value)) return [undefined, index];
   return [
     { type: 'NumericOp', target: first, operator, value: parseFloat(value) },
     index + 3,
   ];
 }
 
-function parseTextOp(
+function parseTextOp<T extends string>(
   tokens: string[],
   index: number,
-  textTargets: Set<string>,
-): [TextOp | undefined, number] {
+  textTargets: Set<T>,
+): [TextOp<T> | undefined, number] {
   const parsed = tokens[index]?.match(textOpRegex);
   if (!parsed) return [undefined, index];
   const [, target, operator] = parsed;
-  if (!oneOf(textOperators, operator) || !target) return [undefined, index];
-  if (!textTargets.has(target)) return [undefined, index];
   const value = tokens[index + 1];
-  if (!value) return [undefined, index];
+  if (
+    !oneOf(textOperators, operator) ||
+    !target ||
+    !oneOf(textTargets, target) ||
+    !value
+  )
+    return [undefined, index];
   return [{ type: 'TextOp', target, operator, value }, index + 2];
 }
 
-function parseNotExpr(
+function parseNotExpr<Types extends TargetTypes>(
   tokens: string[],
   index: number,
-  targetTypes: TargetTypes,
-): [NotExpr | undefined, number] {
+  targetTypes: { [K in keyof Types]: Set<Types[K]> },
+): [NotExpr<Types> | undefined, number] {
   if (tokens[index] !== 'NOT') return [undefined, index];
   const [operand, newIndex] = parseExpr(tokens, index + 1, targetTypes);
   if (!operand) return [undefined, index];
   return [{ type: 'NotExpr', operand }, newIndex];
 }
 
-function parseComplexExpr(
+function parseComplexExpr<Types extends TargetTypes>(
   tokens: string[],
   index: number,
-  targetTypes: TargetTypes,
-): [ComplexExpr | undefined, number] {
+  targetTypes: { [K in keyof Types]: Set<Types[K]> },
+): [ComplexExpr<Types> | undefined, number] {
   const [operand, newIndex] = parseExpr(tokens, index, targetTypes);
   if (!operand) return [undefined, index];
   const operands = [operand];
@@ -318,11 +341,11 @@ function parseComplexExpr(
   return [{ type: 'ComplexExpr', operator: operator ?? 'AND', operands }, i];
 }
 
-function parseExpr(
+function parseExpr<Types extends TargetTypes>(
   tokens: string[],
   index: number,
-  targetTypes: TargetTypes,
-): [Expr | undefined, number] {
+  targetTypes: { [K in keyof Types]: Set<Types[K]> },
+): [Expr<Types> | undefined, number] {
   if (tokens[index] === '(') {
     const [complexExpr, newIndex6] = parseComplexExpr(
       tokens,
@@ -364,7 +387,10 @@ function parseExpr(
   ];
 }
 
-export function parse(input: string, targetTypes: TargetTypes): Expr {
+export function parse<Types extends TargetTypes>(
+  input: string,
+  targetTypes: { [K in keyof Types]: Set<Types[K]> },
+): Expr<Types> {
   const tokens = tokenize(input);
   const [expr, index] = parseComplexExpr(tokens, 0, targetTypes);
   if (!expr || index !== tokens.length) throw new Error('Invalid expression');

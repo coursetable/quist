@@ -1,20 +1,20 @@
 import { describe, expect, test } from 'bun:test';
 import { parse } from './syntax.js';
-import { toPredicate } from './filter.js';
+import { predicate } from './filter.js';
 
 const selectorWithWildcard = (data: any, field: string) =>
   field === '*' ? data.text : data[field];
 
 const targetTypes = {
-  boolean: new Set(['boolean', 'boolean2', 'another-boolean']),
-  set: new Set(['set']),
-  categorical: new Set(['categorical']),
-  numeric: new Set(['numeric']),
-  text: new Set(['text']),
+  boolean: new Set(['boolean', 'boolean2', 'another-boolean'] as const),
+  set: new Set(['set'] as const),
+  categorical: new Set(['categorical'] as const),
+  numeric: new Set(['numeric'] as const),
+  text: new Set(['text'] as const),
 };
 
 const testQuery = (query: string, data: any) =>
-  toPredicate(parse(query, targetTypes)[0]!, selectorWithWildcard)(data);
+  predicate(data, parse(query, targetTypes), selectorWithWildcard);
 
 describe('text op', () => {
   test('text:contains', () => {

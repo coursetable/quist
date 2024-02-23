@@ -2,7 +2,7 @@
 
 ## What is this?
 
-Quist (pronounced [kʊɪst], like "quick") is a small query language for querying JSON data. It is designed to be simple, easy to learn, and **never has syntax errors**.
+Quist (pronounced [kʊɪst], like "quick") is a small query language for querying JSON data. It is designed to be simple, easy to learn, and **never has syntax errors**. It does this by falling back to plain-text matching as soon as possible and only allows query syntax at its strictest interpretation.
 
 Quist is used on [CourseTable](https://coursetable.com) to query course data.
 
@@ -159,3 +159,36 @@ console.log(
   }),
 ); // true
 ```
+
+## TypeScript
+
+For type inference, we strongly recommend you declare your `targetTypes` and `targetGetter` inline.
+
+```ts
+const evaluator = buildEvaluator(
+  {
+    boolean: new Set(['fysem', 'grad']),
+    set: new Set(['professor-names']),
+    categorical: new Set(['subject']),
+    numeric: new Set(['number']),
+  },
+  (data: CourseType, field, expr) => {
+    if (field === 'professor-names') {
+      return data.professors.map((p) => p.name);
+    } else if (field === '*') {
+      return `${data.title} ${data.description}`;
+    }
+    return data[field];
+  },
+);
+
+const predicate = evaluator(
+  '(subject:in MATH, CPSC, S&DS AND 300<=number<500 AND NOT professor-names:has-any-of "Bruce Wayne", "Tony Stark") OR is:fysem',
+); // predicate only accepts CourseType
+
+console.log(predicate(course));
+```
+
+You will notice that everything is automatically strongly typed!
+
+Note: we are still improving type safety as much as we can.

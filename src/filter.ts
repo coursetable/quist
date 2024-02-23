@@ -21,10 +21,14 @@ function numericOp(
   }
 }
 
-export function predicate(
-  data: any,
-  expr: Expr,
-  targetGetter: (data: any, field: string, expr: Expr) => any,
+export function predicate<DT, Types extends TargetTypes>(
+  data: DT,
+  expr: Expr<Types>,
+  targetGetter: (
+    data: DT,
+    field: Types[keyof Types] | '*',
+    expr: Expr<Types>,
+  ) => any,
 ): boolean {
   if (expr.type === 'ComplexExpr') {
     switch (expr.operator) {

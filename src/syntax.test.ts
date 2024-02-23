@@ -2,11 +2,11 @@ import { expect, test } from 'bun:test';
 import { parse } from './syntax.js';
 
 const targetTypes = {
-  boolean: new Set(['fysem', 'grad']),
-  set: new Set(['professors']),
-  categorical: new Set(['subject']),
-  numeric: new Set(['number']),
-  text: new Set(['description']),
+  boolean: new Set(['fysem', 'grad'] as const),
+  set: new Set(['professors'] as const),
+  categorical: new Set(['subject'] as const),
+  numeric: new Set(['number'] as const),
+  text: new Set(['description'] as const),
 };
 
 test('parse', () => {
@@ -19,8 +19,7 @@ test('parse', () => {
     'CPSC 223',
     'WLH',
   ].forEach((input) => {
-    const [ast, completed] = parse(input, targetTypes);
-    expect(completed).toBeTrue();
+    const ast = parse(input, targetTypes);
     expect(ast).toMatchSnapshot();
   });
 });
