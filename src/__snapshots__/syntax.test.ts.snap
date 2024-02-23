@@ -167,3 +167,11 @@ exports[`parse 7`] = `
   "type": "ComplexExpr",
 }
 `;
+
+exports[`parse 8`] = `
+{
+  "operands": [],
+  "operator": "AND",
+  "type": "ComplexExpr",
+}
+`;

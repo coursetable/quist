@@ -262,3 +262,11 @@ describe('set op', () => {
     ).toBeTrue();
   });
 });
+
+describe('edge cases', () => {
+  test('empty query', () => {
+    expect(testQuery('', { text: 'Hello' })).toBeTrue();
+
+    expect(testQuery('', {})).toBeTrue();
+  });
+})

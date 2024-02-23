@@ -18,6 +18,7 @@ test('parse', () => {
     '"quote',
     'CPSC 223',
     'WLH',
+    '',
   ].forEach((input) => {
     const ast = parse(input, targetTypes);
     expect(ast).toMatchSnapshot();

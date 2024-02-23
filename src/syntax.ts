@@ -391,6 +391,8 @@ export function parse<Types extends TargetTypes>(
   input: string,
   targetTypes: { [K in keyof Types]: Set<Types[K]> },
 ): Expr<Types> {
+  if (input === '')
+    return { type: 'ComplexExpr', operator: 'AND', operands: [] };
   const tokens = tokenize(input);
   const [expr, index] = parseComplexExpr(tokens, 0, targetTypes);
   if (!expr || index !== tokens.length) throw new Error('Invalid expression');
