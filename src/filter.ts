@@ -73,6 +73,11 @@ export function predicate<DT, Types extends TargetTypes>(
           return expr.value.some((v) => target.includes(v));
         case 'all-in':
           return target.every((v) => expr.value.includes(v));
+        case 'equals':
+          return (
+            target.length === expr.value.length &&
+            target.every((v) => expr.value.includes(v))
+          );
         default:
           // @ts-expect-error: never check
           throw new Error(`Unknown set operator: ${expr.operator}`);

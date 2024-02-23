@@ -261,6 +261,29 @@ describe('set op', () => {
       }),
     ).toBeTrue();
   });
+
+  test('equals', () => {
+    expect(
+      testQuery('set:equals v, v2', {
+        set: ['v', 'v2'],
+      }),
+    ).toBeTrue();
+    expect(
+      testQuery('set:equals v, v2', {
+        set: ['v2', 'v3'],
+      }),
+    ).toBeFalse();
+    expect(
+      testQuery('set:equals v', {
+        set: ['v', 'v2'],
+      }),
+    ).toBeFalse();
+    expect(
+      testQuery('set:equals v, v2', {
+        set: ['v'],
+      }),
+    ).toBeFalse();
+  });
 });
 
 describe('edge cases', () => {

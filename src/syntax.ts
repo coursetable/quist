@@ -12,7 +12,7 @@ const tokens = [
   /\s+/, // Do not capture whitespace
 ];
 const booleanOperators = ['is', 'not'] as const;
-const setOperators = ['has-all-of', 'has-any-of', 'all-in', 'has'] as const;
+const setOperators = ['has-all-of', 'has-any-of', 'all-in', 'has', 'equals'] as const;
 const categoricalOperators = ['is', 'in'] as const;
 // Has to be in this order so contains-words is checked before contains
 const textOperators = ['contains-words', 'contains', 'matches'] as const;
@@ -78,7 +78,7 @@ interface SetHasOp<S extends string> {
 interface SetCompoundOp<S extends string> {
   type: 'SetOp';
   target: S;
-  operator: 'has-all-of' | 'has-any-of' | 'all-in';
+  operator: 'has-all-of' | 'has-any-of' | 'all-in' | 'equals';
   value: string[];
 }
 

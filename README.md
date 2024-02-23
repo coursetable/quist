@@ -61,7 +61,7 @@ To discuss queries, we first need to talk about data types. Quist supports the f
 In the context of CourseTable, here are some example fields:
 
 - Categorical: `school`, `season`, `type`, `subject`
-- Numerical: `rating`, `workload`, `professor-rating`, `number`, `enrollment`, `credit`
+- Numerical: `rating`, `workload`, `professor-rating`, `number`, `enrollment`, `credits`
 - Boolean: `cancelled`, `conflicting`, `grad`, `fysem`, `colsem`, `discussion`
 - Set: `skills`, `areas`, `days`, `info-attributes`, `subjects`, `professor-names`
 - Text: `title`, `description`, `location`
@@ -106,6 +106,7 @@ Note that you can't do other compound expressions like `num < field > num`. If w
 - `field:has-all-of value1, value2, ..., valueN`: the field contains all of the values (i.e. the field is a superset of the given values).
 - `field:has-any-of value1, value2, ..., valueN`: the field contains any of the values (i.e. the field has an intersection with the given values).
 - `field:all-in value1, value2, ..., valueN`: the field is a subset of the given values.
+- `field:equals value1, value2, ..., valueN`: the field is exactly the same as the given values.
 
 ### Querying text
 
