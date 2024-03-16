@@ -1,6 +1,6 @@
 // Bun Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`parse 1`] = `
+exports[`quist syntax parse "(subject:in MATH, CPSC, S&DS AND 300<=number<500 AND NOT professors:has-any-of "Alan Weide", "Ozan Erat") OR is:fysem" 1`] = `
 {
   "operands": [
     {
@@ -54,7 +54,7 @@ exports[`parse 1`] = `
 }
 `;
 
-exports[`parse 2`] = `
+exports[`quist syntax parse "Hello world" 1`] = `
 {
   "operands": [
     {
@@ -75,7 +75,7 @@ exports[`parse 2`] = `
 }
 `;
 
-exports[`parse 3`] = `
+exports[`quist syntax parse "subject:has MATH" 1`] = `
 {
   "operands": [
     {
@@ -96,7 +96,40 @@ exports[`parse 3`] = `
 }
 `;
 
-exports[`parse 4`] = `
+exports[`quist syntax parse "subject:has "foo bar", "bar baz"" 1`] = `
+{
+  "operands": [
+    {
+      "operator": "contains",
+      "target": "*",
+      "type": "TextOp",
+      "value": "subject:has",
+    },
+    {
+      "operator": "contains",
+      "target": "*",
+      "type": "TextOp",
+      "value": "foo bar",
+    },
+    {
+      "operator": "contains",
+      "target": "*",
+      "type": "TextOp",
+      "value": ",",
+    },
+    {
+      "operator": "contains",
+      "target": "*",
+      "type": "TextOp",
+      "value": "bar baz",
+    },
+  ],
+  "operator": "AND",
+  "type": "ComplexExpr",
+}
+`;
+
+exports[`quist syntax parse "fysem:is x" 1`] = `
 {
   "operands": [
     {
@@ -117,7 +150,7 @@ exports[`parse 4`] = `
 }
 `;
 
-exports[`parse 5`] = `
+exports[`quist syntax parse ""quote" 1`] = `
 {
   "operands": [
     {
@@ -132,7 +165,7 @@ exports[`parse 5`] = `
 }
 `;
 
-exports[`parse 6`] = `
+exports[`quist syntax parse "CPSC 223" 1`] = `
 {
   "operands": [
     {
@@ -153,7 +186,7 @@ exports[`parse 6`] = `
 }
 `;
 
-exports[`parse 7`] = `
+exports[`quist syntax parse "WLH" 1`] = `
 {
   "operands": [
     {
@@ -168,9 +201,132 @@ exports[`parse 7`] = `
 }
 `;
 
-exports[`parse 8`] = `
+exports[`quist syntax parse "" 1`] = `
 {
   "operands": [],
+  "operator": "AND",
+  "type": "ComplexExpr",
+}
+`;
+
+exports[`quist syntax parse "()" 1`] = `
+{
+  "operands": [
+    {
+      "operands": [],
+      "operator": "AND",
+      "type": "ComplexExpr",
+    },
+  ],
+  "operator": "AND",
+  "type": "ComplexExpr",
+}
+`;
+
+exports[`quist syntax parse " " 1`] = `
+{
+  "operands": [],
+  "operator": "AND",
+  "type": "ComplexExpr",
+}
+`;
+
+exports[`quist syntax parse "(" 1`] = `
+{
+  "operands": [
+    {
+      "operator": "contains",
+      "target": "*",
+      "type": "TextOp",
+      "value": "(",
+    },
+  ],
+  "operator": "AND",
+  "type": "ComplexExpr",
+}
+`;
+
+exports[`quist syntax parse "(xxx" 1`] = `
+{
+  "operands": [
+    {
+      "operator": "contains",
+      "target": "*",
+      "type": "TextOp",
+      "value": "(",
+    },
+    {
+      "operator": "contains",
+      "target": "*",
+      "type": "TextOp",
+      "value": "xxx",
+    },
+  ],
+  "operator": "AND",
+  "type": "ComplexExpr",
+}
+`;
+
+exports[`quist syntax parse "a "AND" b" 1`] = `
+{
+  "operands": [
+    {
+      "operator": "contains",
+      "target": "*",
+      "type": "TextOp",
+      "value": "a",
+    },
+    {
+      "operator": "contains",
+      "target": "*",
+      "type": "TextOp",
+      "value": "AND",
+    },
+    {
+      "operator": "contains",
+      "target": "*",
+      "type": "TextOp",
+      "value": "b",
+    },
+  ],
+  "operator": "AND",
+  "type": "ComplexExpr",
+}
+`;
+
+exports[`quist syntax parse ""subject:in" A" 1`] = `
+{
+  "operands": [
+    {
+      "operator": "contains",
+      "target": "*",
+      "type": "TextOp",
+      "value": "subject:in",
+    },
+    {
+      "operator": "contains",
+      "target": "*",
+      "type": "TextOp",
+      "value": "A",
+    },
+  ],
+  "operator": "AND",
+  "type": "ComplexExpr",
+}
+`;
+
+exports[`quist syntax parse "subject:in "A" 1`] = `
+{
+  "operands": [
+    {
+      "operator": "in",
+      "target": "subject",
+      "type": "CategoricalOp",
+      "value": [
+        ""A",
+      ],
+    },
+  ],
   "operator": "AND",
   "type": "ComplexExpr",
 }

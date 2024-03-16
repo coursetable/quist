@@ -1,5 +1,6 @@
 const tokens = [
-  /"([^"]+)"/, // Do not capture the quotes
+  /("[^"]+")/, // Capture the quotes, because keywords must be unquoted
+  // We remove the quotes during shipout
   '(',
   ')',
   ',',
@@ -12,7 +13,13 @@ const tokens = [
   /\s+/, // Do not capture whitespace
 ];
 const booleanOperators = ['is', 'not'] as const;
-const setOperators = ['has-all-of', 'has-any-of', 'all-in', 'has', 'equals'] as const;
+const setOperators = [
+  'has-all-of',
+  'has-any-of',
+  'all-in',
+  'has',
+  'equals',
+] as const;
 const categoricalOperators = ['is', 'in'] as const;
 // Has to be in this order so contains-words is checked before contains
 const textOperators = ['contains-words', 'contains', 'matches'] as const;
@@ -150,6 +157,12 @@ const textOpRegex = new RegExp(
   'u',
 );
 
+function stripQuotes(input: string) {
+  if (input[0] === '"' && input[input.length - 1] === '"')
+    return input.slice(1, -1);
+  return input;
+}
+
 function tokenize(input: string): string[] {
   return input.split(tokenRegex).filter(Boolean);
 }
@@ -188,14 +201,15 @@ function parseSetOp<S extends string>(
   )
     return [undefined, index];
   if (operator === 'has')
-    return [{ type: 'SetOp', target, operator, value }, index + 2];
-  const values = [value];
+    return [
+      { type: 'SetOp', target, operator, value: stripQuotes(value) },
+      index + 2,
+    ];
+  const values = [stripQuotes(value)];
   index += 2;
-  while (tokens[index] === ',') {
-    const value = tokens[index + 1];
-    if (!value)
-      return [{ type: 'SetOp', target, operator, value: values }, index];
-    values.push(value);
+  while (index + 1 < tokens.length && tokens[index] === ',') {
+    const value = tokens[index + 1]!;
+    values.push(stripQuotes(value));
     index += 2;
   }
   return [{ type: 'SetOp', target, operator, value: values }, index];
@@ -218,17 +232,15 @@ function parseCategoricalOp<C extends string>(
   )
     return [undefined, index];
   if (operator === 'is')
-    return [{ type: 'CategoricalOp', target, operator, value }, index + 2];
-  const values = [value];
+    return [
+      { type: 'CategoricalOp', target, operator, value: stripQuotes(value) },
+      index + 2,
+    ];
+  const values = [stripQuotes(value)];
   index += 2;
-  while (tokens[index] === ',') {
-    const value = tokens[index + 1];
-    if (!value)
-      return [
-        { type: 'CategoricalOp', target, operator, value: values },
-        index,
-      ];
-    values.push(value);
+  while (index + 1 < tokens.length && tokens[index] === ',') {
+    const value = tokens[index + 1]!;
+    values.push(stripQuotes(value));
     index += 2;
   }
   return [{ type: 'CategoricalOp', target, operator, value: values }, index];
@@ -303,7 +315,10 @@ function parseTextOp<T extends string>(
     !value
   )
     return [undefined, index];
-  return [{ type: 'TextOp', target, operator, value }, index + 2];
+  return [
+    { type: 'TextOp', target, operator, value: stripQuotes(value) },
+    index + 2,
+  ];
 }
 
 function parseNotExpr<Types extends TargetTypes>(
@@ -323,7 +338,10 @@ function parseComplexExpr<Types extends TargetTypes>(
   targetTypes: { [K in keyof Types]: Set<Types[K]> },
 ): [ComplexExpr<Types> | undefined, number] {
   const [operand, newIndex] = parseExpr(tokens, index, targetTypes);
-  if (!operand) return [undefined, index];
+  // No expr means this complex expr is empty
+  // Return empty AND, which matches anything
+  if (!operand)
+    return [{ type: 'ComplexExpr', operator: 'AND', operands: [] }, index];
   const operands = [operand];
   const operator =
     tokens[newIndex] === 'AND'
@@ -354,6 +372,8 @@ function parseExpr<Types extends TargetTypes>(
     );
     if (complexExpr && tokens[newIndex6] === ')')
       return [complexExpr, newIndex6 + 1];
+  } else if (tokens[index] === ')') {
+    return [undefined, index];
   }
   const [notExpr, newIndex5] = parseNotExpr(tokens, index, targetTypes);
   if (notExpr) return [notExpr, newIndex5];
@@ -382,7 +402,12 @@ function parseExpr<Types extends TargetTypes>(
   const text = tokens[index];
   if (!text) return [undefined, index];
   return [
-    { type: 'TextOp', target: '*', operator: 'contains', value: text },
+    {
+      type: 'TextOp',
+      target: '*',
+      operator: 'contains',
+      value: stripQuotes(text),
+    },
     index + 1,
   ];
 }
@@ -391,8 +416,6 @@ export function parse<Types extends TargetTypes>(
   input: string,
   targetTypes: { [K in keyof Types]: Set<Types[K]> },
 ): Expr<Types> {
-  if (input === '')
-    return { type: 'ComplexExpr', operator: 'AND', operands: [] };
   const tokens = tokenize(input);
   const [expr, index] = parseComplexExpr(tokens, 0, targetTypes);
   if (!expr || index !== tokens.length) throw new Error('Invalid expression');

@@ -1,4 +1,4 @@
-import { expect, test } from 'bun:test';
+import { describe, expect, test } from 'bun:test';
 import { parse } from './syntax.js';
 
 const targetTypes = {
@@ -9,18 +9,28 @@ const targetTypes = {
   text: new Set(['description'] as const),
 };
 
-test('parse', () => {
+describe('quist syntax', () => {
   [
     '(subject:in MATH, CPSC, S&DS AND 300<=number<500 AND NOT professors:has-any-of "Alan Weide", "Ozan Erat") OR is:fysem',
     'Hello world',
     'subject:has MATH',
+    'subject:has "foo bar", "bar baz"',
     'fysem:is x',
     '"quote',
     'CPSC 223',
     'WLH',
     '',
+    '()',
+    ' ',
+    '(',
+    '(xxx',
+    'a "AND" b',
+    '"subject:in" A',
+    'subject:in "A',
   ].forEach((input) => {
-    const ast = parse(input, targetTypes);
-    expect(ast).toMatchSnapshot();
+    test(`parse "${input}"`, () => {
+      const ast = parse(input, targetTypes);
+      expect(ast).toMatchSnapshot();
+    });
   });
 });
