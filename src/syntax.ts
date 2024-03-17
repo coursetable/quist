@@ -336,6 +336,7 @@ function parseComplexExpr<Types extends TargetTypes>(
   tokens: string[],
   index: number,
   targetTypes: { [K in keyof Types]: Set<Types[K]> },
+  acceptRightParen: boolean,
 ): [ComplexExpr<Types> | undefined, number] {
   const [operand, newIndex] = parseExpr(tokens, index, targetTypes);
   // No expr means this complex expr is empty
@@ -350,7 +351,7 @@ function parseComplexExpr<Types extends TargetTypes>(
         ? 'OR'
         : undefined;
   let i = operator ? newIndex + 1 : newIndex;
-  while (i < tokens.length && tokens[i] !== ')') {
+  while (i < tokens.length && (acceptRightParen || tokens[i] !== ')')) {
     const [operand, newIndex] = parseExpr(tokens, i, targetTypes);
     if (!operand) break;
     operands.push(operand);
@@ -369,11 +370,10 @@ function parseExpr<Types extends TargetTypes>(
       tokens,
       index + 1,
       targetTypes,
+      false,
     );
     if (complexExpr && tokens[newIndex6] === ')')
       return [complexExpr, newIndex6 + 1];
-  } else if (tokens[index] === ')') {
-    return [undefined, index];
   }
   const [notExpr, newIndex5] = parseNotExpr(tokens, index, targetTypes);
   if (notExpr) return [notExpr, newIndex5];
@@ -417,7 +417,13 @@ export function parse<Types extends TargetTypes>(
   targetTypes: { [K in keyof Types]: Set<Types[K]> },
 ): Expr<Types> {
   const tokens = tokenize(input);
-  const [expr, index] = parseComplexExpr(tokens, 0, targetTypes);
-  if (!expr || index !== tokens.length) throw new Error('Invalid expression');
+  const [expr, index] = parseComplexExpr(tokens, 0, targetTypes, true);
+  if (!expr) throw new Error('Invalid expression');
+  let newIndex = index;
+  while (newIndex < tokens.length && tokens[newIndex] === ')') {
+    expr.operands.push({ type: 'TextOp', target: '*', operator: 'contains', value: ')' });
+    newIndex++;
+  }
+  if (newIndex < tokens.length) throw new Error('Invalid expression');
   return expr;
 }
