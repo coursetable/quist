@@ -1,9 +1,12 @@
 {
   "name": "quist",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "Queries, fast, simple, robust.",
   "license": "MIT",
   "type": "module",
+  "scripts": {
+    "prepublishOnly": "bun run tsc"
+  },
   "exports": {
     ".": "./dist/index.js"
   },
