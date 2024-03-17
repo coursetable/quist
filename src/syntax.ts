@@ -338,6 +338,10 @@ function parseComplexExpr<Types extends TargetTypes>(
   targetTypes: { [K in keyof Types]: Set<Types[K]> },
   acceptRightParen: boolean,
 ): [ComplexExpr<Types> | undefined, number] {
+  if (!acceptRightParen && tokens[index] === ')') return [
+    { type: 'ComplexExpr', operator: 'AND', operands: [] },
+    index
+  ];
   const [operand, newIndex] = parseExpr(tokens, index, targetTypes);
   // No expr means this complex expr is empty
   // Return empty AND, which matches anything

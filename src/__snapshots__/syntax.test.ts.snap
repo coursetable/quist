@@ -213,16 +213,179 @@ exports[`quist syntax parse "()" 1`] = `
 {
   "operands": [
     {
-      "operator": "contains",
-      "target": "*",
-      "type": "TextOp",
-      "value": "(",
+      "operands": [],
+      "operator": "AND",
+      "type": "ComplexExpr",
+    },
+  ],
+  "operator": "AND",
+  "type": "ComplexExpr",
+}
+`;
+
+exports[`quist syntax parse "(())" 1`] = `
+{
+  "operands": [
+    {
+      "operands": [
+        {
+          "operands": [],
+          "operator": "AND",
+          "type": "ComplexExpr",
+        },
+      ],
+      "operator": "AND",
+      "type": "ComplexExpr",
+    },
+  ],
+  "operator": "AND",
+  "type": "ComplexExpr",
+}
+`;
+
+exports[`quist syntax parse "()()" 1`] = `
+{
+  "operands": [
+    {
+      "operands": [],
+      "operator": "AND",
+      "type": "ComplexExpr",
+    },
+    {
+      "operands": [],
+      "operator": "AND",
+      "type": "ComplexExpr",
+    },
+  ],
+  "operator": "AND",
+  "type": "ComplexExpr",
+}
+`;
+
+exports[`quist syntax parse "() AND ()" 1`] = `
+{
+  "operands": [
+    {
+      "operands": [],
+      "operator": "AND",
+      "type": "ComplexExpr",
+    },
+    {
+      "operands": [],
+      "operator": "AND",
+      "type": "ComplexExpr",
+    },
+  ],
+  "operator": "AND",
+  "type": "ComplexExpr",
+}
+`;
+
+exports[`quist syntax parse "() xxx" 1`] = `
+{
+  "operands": [
+    {
+      "operands": [],
+      "operator": "AND",
+      "type": "ComplexExpr",
     },
     {
       "operator": "contains",
       "target": "*",
       "type": "TextOp",
-      "value": ")",
+      "value": "xxx",
+    },
+  ],
+  "operator": "AND",
+  "type": "ComplexExpr",
+}
+`;
+
+exports[`quist syntax parse "xxx ()" 1`] = `
+{
+  "operands": [
+    {
+      "operator": "contains",
+      "target": "*",
+      "type": "TextOp",
+      "value": "xxx",
+    },
+    {
+      "operands": [],
+      "operator": "AND",
+      "type": "ComplexExpr",
+    },
+  ],
+  "operator": "AND",
+  "type": "ComplexExpr",
+}
+`;
+
+exports[`quist syntax parse "((xxx))" 1`] = `
+{
+  "operands": [
+    {
+      "operands": [
+        {
+          "operands": [
+            {
+              "operator": "contains",
+              "target": "*",
+              "type": "TextOp",
+              "value": "xxx",
+            },
+          ],
+          "operator": "AND",
+          "type": "ComplexExpr",
+        },
+      ],
+      "operator": "AND",
+      "type": "ComplexExpr",
+    },
+  ],
+  "operator": "AND",
+  "type": "ComplexExpr",
+}
+`;
+
+exports[`quist syntax parse "((xxx) AND (yyy)) AND zzz" 1`] = `
+{
+  "operands": [
+    {
+      "operands": [
+        {
+          "operands": [
+            {
+              "operator": "contains",
+              "target": "*",
+              "type": "TextOp",
+              "value": "xxx",
+            },
+          ],
+          "operator": "AND",
+          "type": "ComplexExpr",
+        },
+        {
+          "operands": [
+            {
+              "operator": "contains",
+              "target": "*",
+              "type": "TextOp",
+              "value": "yyy",
+            },
+          ],
+          "operator": "AND",
+          "type": "ComplexExpr",
+        },
+      ],
+      "operator": "AND",
+      "type": "ComplexExpr",
+    },
+    {
+      "operator": "contains",
+      "target": "*",
+      "type": "TextOp",
+      "value": "zzz",
     },
   ],
   "operator": "AND",
