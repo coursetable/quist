@@ -14,3 +14,5 @@ export function buildEvaluator<DT, Types extends TargetTypes>(
     return (item) => predicate(item, expr, targetGetter);
   };
 }
+
+export { parseForTokens } from './syntax.js';

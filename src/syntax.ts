@@ -162,7 +162,21 @@ const textOpRegex = new RegExp(
 );
 
 type Token<V extends string = string> = {
-  type: 'plain' | 'quoted';
+  // Quoted tokens will never be syntax (query, combinator, etc.)
+  quoted: boolean;
+  type: // These correspond to the special characters in the tokenRegex
+  | 'numeric-op'
+    | 'comma'
+    | 'paren'
+    // These can only be contextually determined
+    | `${'boolean' | 'set' | 'categorical' | 'text'}-op`
+    | 'numeric-target'
+    | 'query-arg'
+    | 'number'
+    | 'combinator'
+    | 'wildcard-text'
+    // Should never happen
+    | 'unknown';
   value: V;
   start: number;
   end: number;
@@ -177,7 +191,8 @@ function tokenize(input: string): Token[] {
     const value = match.slice(1).find(Boolean);
     if (match.index > lastIndex) {
       tokens.push({
-        type: 'plain',
+        quoted: false,
+        type: 'unknown',
         value: input.slice(lastIndex, match.index),
         start: lastIndex,
         end: match.index,
@@ -185,8 +200,9 @@ function tokenize(input: string): Token[] {
     }
     if (value) {
       tokens.push({
-        // The first token type is quoted, the rest are plain
-        type: match[1] ? 'quoted' : 'plain',
+        // The first token type is quoted, any unquoted token might be syntax
+        quoted: Boolean(match[1]),
+        type: 'unknown',
         value,
         start: match.index,
         end: match.index + value.length,
@@ -196,7 +212,8 @@ function tokenize(input: string): Token[] {
   }
   if (lastIndex < input.length) {
     tokens.push({
-      type: 'plain',
+      quoted: false,
+      type: 'unknown',
       value: input.slice(lastIndex),
       start: lastIndex,
       end: input.length,
@@ -225,7 +242,7 @@ function matchSyntaxToken(
   token: Token | undefined,
   value: string | readonly string[] | Set<string> | RegExp,
 ) {
-  if (!token || token.type !== 'plain') return false;
+  if (!token || token.quoted) return false;
   if (value instanceof RegExp) return value.exec(token.value);
   if (typeof value === 'string') return token.value === value;
   if (value instanceof Set) return value.has(token.value);
@@ -246,6 +263,7 @@ function parseBooleanOp<B extends string>(
     !oneOf(booleanTargets, target)
   )
     return [undefined, index];
+  tokens[index]!.type = 'boolean-op';
   return [{ type: 'BooleanOp', target, operator }, index + 1];
 }
 
@@ -265,12 +283,17 @@ function parseSetOp<S extends string>(
     !value
   )
     return [undefined, index];
-  if (operator === 'has')
+  tokens[index]!.type = 'set-op';
+  value.type = 'query-arg';
+  if (operator === 'has') {
     return [{ type: 'SetOp', target, operator, value: value.value }, index + 2];
+  }
   const values = [value.value];
   index += 2;
   while (index + 1 < tokens.length && matchSyntaxToken(tokens[index], ',')) {
+    tokens[index]!.type = 'comma';
     const value = tokens[index + 1]!;
+    value.type = 'query-arg';
     values.push(value.value);
     index += 2;
   }
@@ -293,15 +316,20 @@ function parseCategoricalOp<C extends string>(
     !value
   )
     return [undefined, index];
-  if (operator === 'is')
+  tokens[index]!.type = 'categorical-op';
+  value.type = 'query-arg';
+  if (operator === 'is') {
     return [
       { type: 'CategoricalOp', target, operator, value: value.value },
       index + 2,
     ];
+  }
   const values = [value.value];
   index += 2;
   while (index + 1 < tokens.length && matchSyntaxToken(tokens[index], ',')) {
+    tokens[index]!.type = 'comma';
     const value = tokens[index + 1]!;
+    value.type = 'query-arg';
     values.push(value.value);
     index += 2;
   }
@@ -327,11 +355,16 @@ function parseNumericOp<N extends string>(
       !matchSyntaxToken(operator, orderingOperators) ||
       !matchSyntaxToken(target, numericTargets) ||
       !secondOperator ||
-      secondOperator.type !== 'plain' ||
+      secondOperator.quoted ||
       secondOperator.value[0] !== operator.value[0] ||
       !matchSyntaxToken(second, numberRegex)
     )
       return [undefined, index];
+    first.type = 'number';
+    operator.type = 'numeric-op';
+    target.type = 'numeric-target';
+    secondOperator.type = 'numeric-op';
+    second!.type = 'number';
     return [
       {
         type: 'CompoundNumericOp',
@@ -351,6 +384,9 @@ function parseNumericOp<N extends string>(
     !matchSyntaxToken(value, numberRegex)
   )
     return [undefined, index];
+  first.type = 'numeric-target';
+  operator.type = 'numeric-op';
+  value!.type = 'number';
   return [
     {
       type: 'NumericOp',
@@ -378,6 +414,8 @@ function parseTextOp<T extends string>(
     !value
   )
     return [undefined, index];
+  tokens[index]!.type = 'text-op';
+  value.type = 'query-arg';
   return [{ type: 'TextOp', target, operator, value: value.value }, index + 2];
 }
 
@@ -389,6 +427,7 @@ function parseNotExpr<Types extends TargetTypes>(
   if (!matchSyntaxToken(tokens[index], 'NOT')) return [undefined, index];
   const [operand, newIndex] = parseExpr(tokens, index + 1, targetTypes);
   if (!operand) return [undefined, index];
+  tokens[index]!.type = 'combinator';
   return [{ type: 'NotExpr', operand }, newIndex];
 }
 
@@ -411,6 +450,7 @@ function parseComplexExpr<Types extends TargetTypes>(
     : matchSyntaxToken(tokens[newIndex], 'OR')
       ? 'OR'
       : undefined;
+  if (operator) tokens[newIndex]!.type = 'combinator';
   let i = operator ? newIndex + 1 : newIndex;
   while (
     i < tokens.length &&
@@ -419,10 +459,12 @@ function parseComplexExpr<Types extends TargetTypes>(
     const [operand, newIndex] = parseExpr(tokens, i, targetTypes);
     if (!operand) break;
     operands.push(operand);
-    i =
-      operator && tokens[newIndex]?.value === operator
-        ? newIndex + 1
-        : newIndex;
+    if (operator && tokens[newIndex]?.value === operator) {
+      tokens[newIndex]!.type = 'combinator';
+      i = newIndex + 1;
+    } else {
+      i = newIndex;
+    }
   }
   return [{ type: 'ComplexExpr', operator: operator ?? 'AND', operands }, i];
 }
@@ -433,14 +475,17 @@ function parseExpr<Types extends TargetTypes>(
   targetTypes: { [K in keyof Types]: Set<Types[K]> },
 ): [Expr<Types> | undefined, number] {
   if (matchSyntaxToken(tokens[index], '(')) {
+    tokens[index]!.type = 'paren';
     const [complexExpr, newIndex6] = parseComplexExpr(
       tokens,
       index + 1,
       targetTypes,
       false,
     );
-    if (complexExpr && matchSyntaxToken(tokens[newIndex6], ')'))
+    if (complexExpr && matchSyntaxToken(tokens[newIndex6], ')')) {
+      tokens[newIndex6]!.type = 'paren';
       return [complexExpr, newIndex6 + 1];
+    }
   }
   const [notExpr, newIndex5] = parseNotExpr(tokens, index, targetTypes);
   if (notExpr) return [notExpr, newIndex5];
@@ -468,6 +513,7 @@ function parseExpr<Types extends TargetTypes>(
   if (textOp) return [textOp, newIndex7];
   const text = tokens[index];
   if (!text) return [undefined, index];
+  tokens[index]!.type = 'wildcard-text';
   return [
     {
       type: 'TextOp',
@@ -493,4 +539,13 @@ export function parse<Types extends TargetTypes>(
   // }
   if (index < tokens.length) throw new Error('Invalid expression');
   return expr;
+}
+
+export function parseForTokens<Types extends TargetTypes>(
+  input: string,
+  targetTypes: { [K in keyof Types]: Set<Types[K]> },
+): Token[] {
+  const tokens = tokenize(input);
+  parseComplexExpr(tokens, 0, targetTypes, true);
+  return tokens;
 }

@@ -21,7 +21,7 @@ const evaluator = buildEvaluator(
     text: new Set(['text']),
   },
   (data: Data, field, expr) => {
-    if (expr.type === "BooleanOp") return expr.target;
+    if (expr.type === 'BooleanOp') return expr.target;
     if (field === 'text') return data.text;
     return data[field];
   },

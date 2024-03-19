@@ -129,6 +129,21 @@ exports[`quist syntax parse "subject:has "foo bar", "bar baz"" 1`] = `
 }
 `;
 
+exports[`quist syntax parse "description:contains subject:in" 1`] = `
+{
+  "operands": [
+    {
+      "operator": "contains",
+      "target": "description",
+      "type": "TextOp",
+      "value": "subject:in",
+    },
+  ],
+  "operator": "AND",
+  "type": "ComplexExpr",
+}
+`;
+
 exports[`quist syntax parse "fysem:is x" 1`] = `
 {
   "operands": [
@@ -194,6 +209,21 @@ exports[`quist syntax parse "WLH" 1`] = `
       "target": "*",
       "type": "TextOp",
       "value": "WLH",
+    },
+  ],
+  "operator": "AND",
+  "type": "ComplexExpr",
+}
+`;
+
+exports[`quist syntax parse "NOT" 1`] = `
+{
+  "operands": [
+    {
+      "operator": "contains",
+      "target": "*",
+      "type": "TextOp",
+      "value": "NOT",
     },
   ],
   "operator": "AND",
@@ -445,6 +475,60 @@ exports[`quist syntax parse "xxx)" 1`] = `
       "target": "*",
       "type": "TextOp",
       "value": "xxx",
+    },
+    {
+      "operator": "contains",
+      "target": "*",
+      "type": "TextOp",
+      "value": ")",
+    },
+  ],
+  "operator": "AND",
+  "type": "ComplexExpr",
+}
+`;
+
+exports[`quist syntax parse "xxx))" 1`] = `
+{
+  "operands": [
+    {
+      "operator": "contains",
+      "target": "*",
+      "type": "TextOp",
+      "value": "xxx",
+    },
+    {
+      "operator": "contains",
+      "target": "*",
+      "type": "TextOp",
+      "value": ")",
+    },
+    {
+      "operator": "contains",
+      "target": "*",
+      "type": "TextOp",
+      "value": ")",
+    },
+  ],
+  "operator": "AND",
+  "type": "ComplexExpr",
+}
+`;
+
+exports[`quist syntax parse "(xxx))" 1`] = `
+{
+  "operands": [
+    {
+      "operands": [
+        {
+          "operator": "contains",
+          "target": "*",
+          "type": "TextOp",
+          "value": "xxx",
+        },
+      ],
+      "operator": "AND",
+      "type": "ComplexExpr",
     },
     {
       "operator": "contains",
@@ -805,86 +889,1159 @@ exports[`quist syntax parse "subject:in "A" 1`] = `
 }
 `;
 
-exports[`quist syntax parse "xxx))" 1`] = `
-{
-  "operands": [
-    {
-      "operator": "contains",
-      "target": "*",
-      "type": "TextOp",
-      "value": "xxx",
-    },
-    {
-      "operator": "contains",
-      "target": "*",
-      "type": "TextOp",
-      "value": ")",
-    },
-    {
-      "operator": "contains",
-      "target": "*",
-      "type": "TextOp",
-      "value": ")",
-    },
-  ],
-  "operator": "AND",
-  "type": "ComplexExpr",
-}
+exports[`tokens tokenize "(subject:in MATH, CPSC, S&DS AND 300<=number<500 AND NOT professors:has-any-of "Alan Weide", "Ozan Erat") OR is:fysem" 1`] = `
+[
+  {
+    "end": 1,
+    "quoted": false,
+    "start": 0,
+    "type": "paren",
+    "value": "(",
+  },
+  {
+    "end": 11,
+    "quoted": false,
+    "start": 1,
+    "type": "categorical-op",
+    "value": "subject:in",
+  },
+  {
+    "end": 16,
+    "quoted": false,
+    "start": 12,
+    "type": "query-arg",
+    "value": "MATH",
+  },
+  {
+    "end": 17,
+    "quoted": false,
+    "start": 16,
+    "type": "comma",
+    "value": ",",
+  },
+  {
+    "end": 22,
+    "quoted": false,
+    "start": 18,
+    "type": "query-arg",
+    "value": "CPSC",
+  },
+  {
+    "end": 23,
+    "quoted": false,
+    "start": 22,
+    "type": "comma",
+    "value": ",",
+  },
+  {
+    "end": 28,
+    "quoted": false,
+    "start": 24,
+    "type": "query-arg",
+    "value": "S&DS",
+  },
+  {
+    "end": 32,
+    "quoted": false,
+    "start": 29,
+    "type": "combinator",
+    "value": "AND",
+  },
+  {
+    "end": 36,
+    "quoted": false,
+    "start": 33,
+    "type": "number",
+    "value": "300",
+  },
+  {
+    "end": 38,
+    "quoted": false,
+    "start": 36,
+    "type": "numeric-op",
+    "value": "<=",
+  },
+  {
+    "end": 44,
+    "quoted": false,
+    "start": 38,
+    "type": "numeric-target",
+    "value": "number",
+  },
+  {
+    "end": 45,
+    "quoted": false,
+    "start": 44,
+    "type": "numeric-op",
+    "value": "<",
+  },
+  {
+    "end": 48,
+    "quoted": false,
+    "start": 45,
+    "type": "number",
+    "value": "500",
+  },
+  {
+    "end": 52,
+    "quoted": false,
+    "start": 49,
+    "type": "combinator",
+    "value": "AND",
+  },
+  {
+    "end": 56,
+    "quoted": false,
+    "start": 53,
+    "type": "combinator",
+    "value": "NOT",
+  },
+  {
+    "end": 78,
+    "quoted": false,
+    "start": 57,
+    "type": "set-op",
+    "value": "professors:has-any-of",
+  },
+  {
+    "end": 89,
+    "quoted": true,
+    "start": 79,
+    "type": "query-arg",
+    "value": "Alan Weide",
+  },
+  {
+    "end": 92,
+    "quoted": false,
+    "start": 91,
+    "type": "comma",
+    "value": ",",
+  },
+  {
+    "end": 102,
+    "quoted": true,
+    "start": 93,
+    "type": "query-arg",
+    "value": "Ozan Erat",
+  },
+  {
+    "end": 105,
+    "quoted": false,
+    "start": 104,
+    "type": "paren",
+    "value": ")",
+  },
+  {
+    "end": 108,
+    "quoted": false,
+    "start": 106,
+    "type": "combinator",
+    "value": "OR",
+  },
+  {
+    "end": 117,
+    "quoted": false,
+    "start": 109,
+    "type": "boolean-op",
+    "value": "is:fysem",
+  },
+]
 `;
 
-exports[`quist syntax parse "(xxx))" 1`] = `
-{
-  "operands": [
-    {
-      "operands": [
-        {
-          "operator": "contains",
-          "target": "*",
-          "type": "TextOp",
-          "value": "xxx",
-        },
-      ],
-      "operator": "AND",
-      "type": "ComplexExpr",
-    },
-    {
-      "operator": "contains",
-      "target": "*",
-      "type": "TextOp",
-      "value": ")",
-    },
-  ],
-  "operator": "AND",
-  "type": "ComplexExpr",
-}
+exports[`tokens tokenize "Hello world" 1`] = `
+[
+  {
+    "end": 5,
+    "quoted": false,
+    "start": 0,
+    "type": "wildcard-text",
+    "value": "Hello",
+  },
+  {
+    "end": 11,
+    "quoted": false,
+    "start": 6,
+    "type": "wildcard-text",
+    "value": "world",
+  },
+]
 `;
 
-exports[`quist syntax parse "description:contains subject:in" 1`] = `
-{
-  "operands": [
-    {
-      "operator": "contains",
-      "target": "description",
-      "type": "TextOp",
-      "value": "subject:in",
-    },
-  ],
-  "operator": "AND",
-  "type": "ComplexExpr",
-}
+exports[`tokens tokenize "subject:has MATH" 1`] = `
+[
+  {
+    "end": 11,
+    "quoted": false,
+    "start": 0,
+    "type": "wildcard-text",
+    "value": "subject:has",
+  },
+  {
+    "end": 16,
+    "quoted": false,
+    "start": 12,
+    "type": "wildcard-text",
+    "value": "MATH",
+  },
+]
 `;
 
-exports[`quist syntax parse "NOT" 1`] = `
-{
-  "operands": [
-    {
-      "operator": "contains",
-      "target": "*",
-      "type": "TextOp",
-      "value": "NOT",
-    },
-  ],
-  "operator": "AND",
-  "type": "ComplexExpr",
-}
+exports[`tokens tokenize "subject:has "foo bar", "bar baz"" 1`] = `
+[
+  {
+    "end": 11,
+    "quoted": false,
+    "start": 0,
+    "type": "wildcard-text",
+    "value": "subject:has",
+  },
+  {
+    "end": 19,
+    "quoted": true,
+    "start": 12,
+    "type": "wildcard-text",
+    "value": "foo bar",
+  },
+  {
+    "end": 22,
+    "quoted": false,
+    "start": 21,
+    "type": "wildcard-text",
+    "value": ",",
+  },
+  {
+    "end": 30,
+    "quoted": true,
+    "start": 23,
+    "type": "wildcard-text",
+    "value": "bar baz",
+  },
+]
+`;
+
+exports[`tokens tokenize "description:contains subject:in" 1`] = `
+[
+  {
+    "end": 20,
+    "quoted": false,
+    "start": 0,
+    "type": "text-op",
+    "value": "description:contains",
+  },
+  {
+    "end": 31,
+    "quoted": false,
+    "start": 21,
+    "type": "query-arg",
+    "value": "subject:in",
+  },
+]
+`;
+
+exports[`tokens tokenize "fysem:is x" 1`] = `
+[
+  {
+    "end": 8,
+    "quoted": false,
+    "start": 0,
+    "type": "wildcard-text",
+    "value": "fysem:is",
+  },
+  {
+    "end": 10,
+    "quoted": false,
+    "start": 9,
+    "type": "wildcard-text",
+    "value": "x",
+  },
+]
+`;
+
+exports[`tokens tokenize ""quote" 1`] = `
+[
+  {
+    "end": 6,
+    "quoted": false,
+    "start": 0,
+    "type": "wildcard-text",
+    "value": ""quote",
+  },
+]
+`;
+
+exports[`tokens tokenize "CPSC 223" 1`] = `
+[
+  {
+    "end": 4,
+    "quoted": false,
+    "start": 0,
+    "type": "wildcard-text",
+    "value": "CPSC",
+  },
+  {
+    "end": 8,
+    "quoted": false,
+    "start": 5,
+    "type": "wildcard-text",
+    "value": "223",
+  },
+]
+`;
+
+exports[`tokens tokenize "WLH" 1`] = `
+[
+  {
+    "end": 3,
+    "quoted": false,
+    "start": 0,
+    "type": "wildcard-text",
+    "value": "WLH",
+  },
+]
+`;
+
+exports[`tokens tokenize "NOT" 1`] = `
+[
+  {
+    "end": 3,
+    "quoted": false,
+    "start": 0,
+    "type": "wildcard-text",
+    "value": "NOT",
+  },
+]
+`;
+
+exports[`tokens tokenize "" 1`] = `[]`;
+
+exports[`tokens tokenize "()" 1`] = `
+[
+  {
+    "end": 1,
+    "quoted": false,
+    "start": 0,
+    "type": "paren",
+    "value": "(",
+  },
+  {
+    "end": 2,
+    "quoted": false,
+    "start": 1,
+    "type": "paren",
+    "value": ")",
+  },
+]
+`;
+
+exports[`tokens tokenize "(())" 1`] = `
+[
+  {
+    "end": 1,
+    "quoted": false,
+    "start": 0,
+    "type": "paren",
+    "value": "(",
+  },
+  {
+    "end": 2,
+    "quoted": false,
+    "start": 1,
+    "type": "paren",
+    "value": "(",
+  },
+  {
+    "end": 3,
+    "quoted": false,
+    "start": 2,
+    "type": "paren",
+    "value": ")",
+  },
+  {
+    "end": 4,
+    "quoted": false,
+    "start": 3,
+    "type": "paren",
+    "value": ")",
+  },
+]
+`;
+
+exports[`tokens tokenize "()()" 1`] = `
+[
+  {
+    "end": 1,
+    "quoted": false,
+    "start": 0,
+    "type": "paren",
+    "value": "(",
+  },
+  {
+    "end": 2,
+    "quoted": false,
+    "start": 1,
+    "type": "paren",
+    "value": ")",
+  },
+  {
+    "end": 3,
+    "quoted": false,
+    "start": 2,
+    "type": "paren",
+    "value": "(",
+  },
+  {
+    "end": 4,
+    "quoted": false,
+    "start": 3,
+    "type": "paren",
+    "value": ")",
+  },
+]
+`;
+
+exports[`tokens tokenize "() AND ()" 1`] = `
+[
+  {
+    "end": 1,
+    "quoted": false,
+    "start": 0,
+    "type": "paren",
+    "value": "(",
+  },
+  {
+    "end": 2,
+    "quoted": false,
+    "start": 1,
+    "type": "paren",
+    "value": ")",
+  },
+  {
+    "end": 6,
+    "quoted": false,
+    "start": 3,
+    "type": "combinator",
+    "value": "AND",
+  },
+  {
+    "end": 8,
+    "quoted": false,
+    "start": 7,
+    "type": "paren",
+    "value": "(",
+  },
+  {
+    "end": 9,
+    "quoted": false,
+    "start": 8,
+    "type": "paren",
+    "value": ")",
+  },
+]
+`;
+
+exports[`tokens tokenize "() xxx" 1`] = `
+[
+  {
+    "end": 1,
+    "quoted": false,
+    "start": 0,
+    "type": "paren",
+    "value": "(",
+  },
+  {
+    "end": 2,
+    "quoted": false,
+    "start": 1,
+    "type": "paren",
+    "value": ")",
+  },
+  {
+    "end": 6,
+    "quoted": false,
+    "start": 3,
+    "type": "wildcard-text",
+    "value": "xxx",
+  },
+]
+`;
+
+exports[`tokens tokenize "xxx ()" 1`] = `
+[
+  {
+    "end": 3,
+    "quoted": false,
+    "start": 0,
+    "type": "wildcard-text",
+    "value": "xxx",
+  },
+  {
+    "end": 5,
+    "quoted": false,
+    "start": 4,
+    "type": "paren",
+    "value": "(",
+  },
+  {
+    "end": 6,
+    "quoted": false,
+    "start": 5,
+    "type": "paren",
+    "value": ")",
+  },
+]
+`;
+
+exports[`tokens tokenize "((xxx))" 1`] = `
+[
+  {
+    "end": 1,
+    "quoted": false,
+    "start": 0,
+    "type": "paren",
+    "value": "(",
+  },
+  {
+    "end": 2,
+    "quoted": false,
+    "start": 1,
+    "type": "paren",
+    "value": "(",
+  },
+  {
+    "end": 5,
+    "quoted": false,
+    "start": 2,
+    "type": "wildcard-text",
+    "value": "xxx",
+  },
+  {
+    "end": 6,
+    "quoted": false,
+    "start": 5,
+    "type": "paren",
+    "value": ")",
+  },
+  {
+    "end": 7,
+    "quoted": false,
+    "start": 6,
+    "type": "paren",
+    "value": ")",
+  },
+]
+`;
+
+exports[`tokens tokenize "((xxx) AND (yyy)) AND zzz" 1`] = `
+[
+  {
+    "end": 1,
+    "quoted": false,
+    "start": 0,
+    "type": "paren",
+    "value": "(",
+  },
+  {
+    "end": 2,
+    "quoted": false,
+    "start": 1,
+    "type": "paren",
+    "value": "(",
+  },
+  {
+    "end": 5,
+    "quoted": false,
+    "start": 2,
+    "type": "wildcard-text",
+    "value": "xxx",
+  },
+  {
+    "end": 6,
+    "quoted": false,
+    "start": 5,
+    "type": "paren",
+    "value": ")",
+  },
+  {
+    "end": 10,
+    "quoted": false,
+    "start": 7,
+    "type": "combinator",
+    "value": "AND",
+  },
+  {
+    "end": 12,
+    "quoted": false,
+    "start": 11,
+    "type": "paren",
+    "value": "(",
+  },
+  {
+    "end": 15,
+    "quoted": false,
+    "start": 12,
+    "type": "wildcard-text",
+    "value": "yyy",
+  },
+  {
+    "end": 16,
+    "quoted": false,
+    "start": 15,
+    "type": "paren",
+    "value": ")",
+  },
+  {
+    "end": 17,
+    "quoted": false,
+    "start": 16,
+    "type": "paren",
+    "value": ")",
+  },
+  {
+    "end": 21,
+    "quoted": false,
+    "start": 18,
+    "type": "combinator",
+    "value": "AND",
+  },
+  {
+    "end": 25,
+    "quoted": false,
+    "start": 22,
+    "type": "wildcard-text",
+    "value": "zzz",
+  },
+]
+`;
+
+exports[`tokens tokenize " " 1`] = `[]`;
+
+exports[`tokens tokenize "(" 1`] = `
+[
+  {
+    "end": 1,
+    "quoted": false,
+    "start": 0,
+    "type": "wildcard-text",
+    "value": "(",
+  },
+]
+`;
+
+exports[`tokens tokenize "(xxx" 1`] = `
+[
+  {
+    "end": 1,
+    "quoted": false,
+    "start": 0,
+    "type": "wildcard-text",
+    "value": "(",
+  },
+  {
+    "end": 4,
+    "quoted": false,
+    "start": 1,
+    "type": "wildcard-text",
+    "value": "xxx",
+  },
+]
+`;
+
+exports[`tokens tokenize "xxx)" 1`] = `
+[
+  {
+    "end": 3,
+    "quoted": false,
+    "start": 0,
+    "type": "wildcard-text",
+    "value": "xxx",
+  },
+  {
+    "end": 4,
+    "quoted": false,
+    "start": 3,
+    "type": "wildcard-text",
+    "value": ")",
+  },
+]
+`;
+
+exports[`tokens tokenize "xxx))" 1`] = `
+[
+  {
+    "end": 3,
+    "quoted": false,
+    "start": 0,
+    "type": "wildcard-text",
+    "value": "xxx",
+  },
+  {
+    "end": 4,
+    "quoted": false,
+    "start": 3,
+    "type": "wildcard-text",
+    "value": ")",
+  },
+  {
+    "end": 5,
+    "quoted": false,
+    "start": 4,
+    "type": "wildcard-text",
+    "value": ")",
+  },
+]
+`;
+
+exports[`tokens tokenize "(xxx))" 1`] = `
+[
+  {
+    "end": 1,
+    "quoted": false,
+    "start": 0,
+    "type": "paren",
+    "value": "(",
+  },
+  {
+    "end": 4,
+    "quoted": false,
+    "start": 1,
+    "type": "wildcard-text",
+    "value": "xxx",
+  },
+  {
+    "end": 5,
+    "quoted": false,
+    "start": 4,
+    "type": "paren",
+    "value": ")",
+  },
+  {
+    "end": 6,
+    "quoted": false,
+    "start": 5,
+    "type": "wildcard-text",
+    "value": ")",
+  },
+]
+`;
+
+exports[`tokens tokenize "(xxx)" 1`] = `
+[
+  {
+    "end": 1,
+    "quoted": false,
+    "start": 0,
+    "type": "paren",
+    "value": "(",
+  },
+  {
+    "end": 4,
+    "quoted": false,
+    "start": 1,
+    "type": "wildcard-text",
+    "value": "xxx",
+  },
+  {
+    "end": 5,
+    "quoted": false,
+    "start": 4,
+    "type": "paren",
+    "value": ")",
+  },
+]
+`;
+
+exports[`tokens tokenize "xxx AND ) AND yyy" 1`] = `
+[
+  {
+    "end": 3,
+    "quoted": false,
+    "start": 0,
+    "type": "wildcard-text",
+    "value": "xxx",
+  },
+  {
+    "end": 7,
+    "quoted": false,
+    "start": 4,
+    "type": "combinator",
+    "value": "AND",
+  },
+  {
+    "end": 9,
+    "quoted": false,
+    "start": 8,
+    "type": "wildcard-text",
+    "value": ")",
+  },
+  {
+    "end": 13,
+    "quoted": false,
+    "start": 10,
+    "type": "combinator",
+    "value": "AND",
+  },
+  {
+    "end": 17,
+    "quoted": false,
+    "start": 14,
+    "type": "wildcard-text",
+    "value": "yyy",
+  },
+]
+`;
+
+exports[`tokens tokenize "xxx AND ( AND yyy" 1`] = `
+[
+  {
+    "end": 3,
+    "quoted": false,
+    "start": 0,
+    "type": "wildcard-text",
+    "value": "xxx",
+  },
+  {
+    "end": 7,
+    "quoted": false,
+    "start": 4,
+    "type": "combinator",
+    "value": "AND",
+  },
+  {
+    "end": 9,
+    "quoted": false,
+    "start": 8,
+    "type": "wildcard-text",
+    "value": "(",
+  },
+  {
+    "end": 13,
+    "quoted": false,
+    "start": 10,
+    "type": "combinator",
+    "value": "AND",
+  },
+  {
+    "end": 17,
+    "quoted": false,
+    "start": 14,
+    "type": "wildcard-text",
+    "value": "yyy",
+  },
+]
+`;
+
+exports[`tokens tokenize "xxx AND (yyy" 1`] = `
+[
+  {
+    "end": 3,
+    "quoted": false,
+    "start": 0,
+    "type": "wildcard-text",
+    "value": "xxx",
+  },
+  {
+    "end": 7,
+    "quoted": false,
+    "start": 4,
+    "type": "combinator",
+    "value": "AND",
+  },
+  {
+    "end": 9,
+    "quoted": false,
+    "start": 8,
+    "type": "wildcard-text",
+    "value": "(",
+  },
+  {
+    "end": 12,
+    "quoted": false,
+    "start": 9,
+    "type": "wildcard-text",
+    "value": "yyy",
+  },
+]
+`;
+
+exports[`tokens tokenize "xxx AND (yyy)" 1`] = `
+[
+  {
+    "end": 3,
+    "quoted": false,
+    "start": 0,
+    "type": "wildcard-text",
+    "value": "xxx",
+  },
+  {
+    "end": 7,
+    "quoted": false,
+    "start": 4,
+    "type": "combinator",
+    "value": "AND",
+  },
+  {
+    "end": 9,
+    "quoted": false,
+    "start": 8,
+    "type": "paren",
+    "value": "(",
+  },
+  {
+    "end": 12,
+    "quoted": false,
+    "start": 9,
+    "type": "wildcard-text",
+    "value": "yyy",
+  },
+  {
+    "end": 13,
+    "quoted": false,
+    "start": 12,
+    "type": "paren",
+    "value": ")",
+  },
+]
+`;
+
+exports[`tokens tokenize "xxx (AND) yyy" 1`] = `
+[
+  {
+    "end": 3,
+    "quoted": false,
+    "start": 0,
+    "type": "wildcard-text",
+    "value": "xxx",
+  },
+  {
+    "end": 5,
+    "quoted": false,
+    "start": 4,
+    "type": "paren",
+    "value": "(",
+  },
+  {
+    "end": 8,
+    "quoted": false,
+    "start": 5,
+    "type": "wildcard-text",
+    "value": "AND",
+  },
+  {
+    "end": 9,
+    "quoted": false,
+    "start": 8,
+    "type": "paren",
+    "value": ")",
+  },
+  {
+    "end": 13,
+    "quoted": false,
+    "start": 10,
+    "type": "wildcard-text",
+    "value": "yyy",
+  },
+]
+`;
+
+exports[`tokens tokenize "xxx AND yyy zzz" 1`] = `
+[
+  {
+    "end": 3,
+    "quoted": false,
+    "start": 0,
+    "type": "wildcard-text",
+    "value": "xxx",
+  },
+  {
+    "end": 7,
+    "quoted": false,
+    "start": 4,
+    "type": "combinator",
+    "value": "AND",
+  },
+  {
+    "end": 11,
+    "quoted": false,
+    "start": 8,
+    "type": "wildcard-text",
+    "value": "yyy",
+  },
+  {
+    "end": 15,
+    "quoted": false,
+    "start": 12,
+    "type": "wildcard-text",
+    "value": "zzz",
+  },
+]
+`;
+
+exports[`tokens tokenize "xxx OR yyy AND zzz" 1`] = `
+[
+  {
+    "end": 3,
+    "quoted": false,
+    "start": 0,
+    "type": "wildcard-text",
+    "value": "xxx",
+  },
+  {
+    "end": 6,
+    "quoted": false,
+    "start": 4,
+    "type": "combinator",
+    "value": "OR",
+  },
+  {
+    "end": 10,
+    "quoted": false,
+    "start": 7,
+    "type": "wildcard-text",
+    "value": "yyy",
+  },
+  {
+    "end": 14,
+    "quoted": false,
+    "start": 11,
+    "type": "wildcard-text",
+    "value": "AND",
+  },
+  {
+    "end": 18,
+    "quoted": false,
+    "start": 15,
+    "type": "wildcard-text",
+    "value": "zzz",
+  },
+]
+`;
+
+exports[`tokens tokenize "xxx OR yyy zzz" 1`] = `
+[
+  {
+    "end": 3,
+    "quoted": false,
+    "start": 0,
+    "type": "wildcard-text",
+    "value": "xxx",
+  },
+  {
+    "end": 6,
+    "quoted": false,
+    "start": 4,
+    "type": "combinator",
+    "value": "OR",
+  },
+  {
+    "end": 10,
+    "quoted": false,
+    "start": 7,
+    "type": "wildcard-text",
+    "value": "yyy",
+  },
+  {
+    "end": 14,
+    "quoted": false,
+    "start": 11,
+    "type": "wildcard-text",
+    "value": "zzz",
+  },
+]
+`;
+
+exports[`tokens tokenize "xxx yyy AND zzz" 1`] = `
+[
+  {
+    "end": 3,
+    "quoted": false,
+    "start": 0,
+    "type": "wildcard-text",
+    "value": "xxx",
+  },
+  {
+    "end": 7,
+    "quoted": false,
+    "start": 4,
+    "type": "wildcard-text",
+    "value": "yyy",
+  },
+  {
+    "end": 11,
+    "quoted": false,
+    "start": 8,
+    "type": "wildcard-text",
+    "value": "AND",
+  },
+  {
+    "end": 15,
+    "quoted": false,
+    "start": 12,
+    "type": "wildcard-text",
+    "value": "zzz",
+  },
+]
+`;
+
+exports[`tokens tokenize "a "AND" b" 1`] = `
+[
+  {
+    "end": 1,
+    "quoted": false,
+    "start": 0,
+    "type": "wildcard-text",
+    "value": "a",
+  },
+  {
+    "end": 5,
+    "quoted": true,
+    "start": 2,
+    "type": "wildcard-text",
+    "value": "AND",
+  },
+  {
+    "end": 9,
+    "quoted": false,
+    "start": 8,
+    "type": "wildcard-text",
+    "value": "b",
+  },
+]
+`;
+
+exports[`tokens tokenize ""subject:in" A" 1`] = `
+[
+  {
+    "end": 10,
+    "quoted": true,
+    "start": 0,
+    "type": "wildcard-text",
+    "value": "subject:in",
+  },
+  {
+    "end": 14,
+    "quoted": false,
+    "start": 13,
+    "type": "wildcard-text",
+    "value": "A",
+  },
+]
+`;
+
+exports[`tokens tokenize "subject:in "A" 1`] = `
+[
+  {
+    "end": 10,
+    "quoted": false,
+    "start": 0,
+    "type": "categorical-op",
+    "value": "subject:in",
+  },
+  {
+    "end": 13,
+    "quoted": false,
+    "start": 11,
+    "type": "query-arg",
+    "value": ""A",
+  },
+]
 `;
