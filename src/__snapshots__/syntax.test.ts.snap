@@ -804,3 +804,87 @@ exports[`quist syntax parse "subject:in "A" 1`] = `
   "type": "ComplexExpr",
 }
 `;
+
+exports[`quist syntax parse "xxx))" 1`] = `
+{
+  "operands": [
+    {
+      "operator": "contains",
+      "target": "*",
+      "type": "TextOp",
+      "value": "xxx",
+    },
+    {
+      "operator": "contains",
+      "target": "*",
+      "type": "TextOp",
+      "value": ")",
+    },
+    {
+      "operator": "contains",
+      "target": "*",
+      "type": "TextOp",
+      "value": ")",
+    },
+  ],
+  "operator": "AND",
+  "type": "ComplexExpr",
+}
+`;
+
+exports[`quist syntax parse "(xxx))" 1`] = `
+{
+  "operands": [
+    {
+      "operands": [
+        {
+          "operator": "contains",
+          "target": "*",
+          "type": "TextOp",
+          "value": "xxx",
+        },
+      ],
+      "operator": "AND",
+      "type": "ComplexExpr",
+    },
+    {
+      "operator": "contains",
+      "target": "*",
+      "type": "TextOp",
+      "value": ")",
+    },
+  ],
+  "operator": "AND",
+  "type": "ComplexExpr",
+}
+`;
+
+exports[`quist syntax parse "description:contains subject:in" 1`] = `
+{
+  "operands": [
+    {
+      "operator": "contains",
+      "target": "description",
+      "type": "TextOp",
+      "value": "subject:in",
+    },
+  ],
+  "operator": "AND",
+  "type": "ComplexExpr",
+}
+`;
+
+exports[`quist syntax parse "NOT" 1`] = `
+{
+  "operands": [
+    {
+      "operator": "contains",
+      "target": "*",
+      "type": "TextOp",
+      "value": "NOT",
+    },
+  ],
+  "operator": "AND",
+  "type": "ComplexExpr",
+}
+`;
