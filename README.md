@@ -122,9 +122,24 @@ Also, any token that does not belong to a query is implicitly part of `*:contain
 
 ## Using the API
 
-We have a single API: `buildEvaluator`. First, it takes to parameters describing your intended JSON shape: `targetTypes` and `targetGetter`. `targetTypes` defines the type of each field, and queries containing unrecognized fields or fields with wrong types will become plain text. `targetGetter` defines how to map field names in queries to actual values in the JSON. By default, it uses `(data, field) => data[field]`, but you can customize this logic. **By default, it does not support the `*` query.** You must explicitly define what it means in `targetGetter`.
+We have a single API: `buildEvaluator`. It takes two parameters describing your intended JSON shape:
+
+- `targetTypes`
+  - Defines the type of each field, and queries containing unrecognized fields or fields with wrong types will become plain text. It can have the following keys:
+
+    - `categorical`
+    - `numeric`
+    - `boolean`
+    - `set`
+    - `text`
+
+    Each key should have a `Set` of field names that are of that type. The field names can contain any character except: whitespace, `(`, `)`, `,`, `:`, `=`, `<`, `>`, `!`, `"`.
+- `targetGetter`
+  - Defines how to map field names in queries to actual values in the JSON. By default, it uses `(data, field) => data[field]`, but you can customize this logic. **By default, it does not support the `*` query.** You must explicitly define what it means in `targetGetter`.
 
 `buildEvaluator` returns a query evaluator, which is a function that takes a query string and returns a _predicate_. This predicate is a function that takes a target value and returns a boolean indicating whether the target value satisfies the query.
+
+For the exact signature, refer to our TypeScript definitions.
 
 ```js
 import { buildEvaluator } from 'quist';
@@ -134,6 +149,7 @@ const targetTypes = {
   set: new Set(['professor-names']),
   categorical: new Set(['subject']),
   numeric: new Set(['number']),
+  text: new Set(['title', 'description']),
 };
 
 const targetGetter = (data, field, expr) => {

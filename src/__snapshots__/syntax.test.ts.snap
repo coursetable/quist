@@ -129,6 +129,21 @@ exports[`quist syntax parse "subject:has "foo bar", "bar baz"" 1`] = `
 }
 `;
 
+exports[`quist syntax parse "listings.subject-codes:has MATH" 1`] = `
+{
+  "operands": [
+    {
+      "operator": "has",
+      "target": "listings.subject-codes",
+      "type": "SetOp",
+      "value": "MATH",
+    },
+  ],
+  "operator": "AND",
+  "type": "ComplexExpr",
+}
+`;
+
 exports[`quist syntax parse "description:contains subject:in" 1`] = `
 {
   "operands": [
@@ -1115,6 +1130,25 @@ exports[`tokens tokenize "subject:has "foo bar", "bar baz"" 1`] = `
     "start": 23,
     "type": "wildcard-text",
     "value": "bar baz",
+  },
+]
+`;
+
+exports[`tokens tokenize "listings.subject-codes:has MATH" 1`] = `
+[
+  {
+    "end": 26,
+    "quoted": false,
+    "start": 0,
+    "type": "set-op",
+    "value": "listings.subject-codes:has",
+  },
+  {
+    "end": 31,
+    "quoted": false,
+    "start": 27,
+    "type": "query-arg",
+    "value": "MATH",
   },
 ]
 `;

@@ -3,7 +3,7 @@ import { parse, parseForTokens } from './syntax.js';
 
 const targetTypes = {
   boolean: new Set(['fysem', 'grad'] as const),
-  set: new Set(['professors'] as const),
+  set: new Set(['professors', 'listings.subject-codes'] as const),
   categorical: new Set(['subject'] as const),
   numeric: new Set(['number'] as const),
   text: new Set(['description'] as const),
@@ -14,6 +14,7 @@ const cases = [
   'Hello world',
   'subject:has MATH',
   'subject:has "foo bar", "bar baz"',
+  'listings.subject-codes:has MATH',
   'description:contains subject:in',
   'fysem:is x',
   '"quote',

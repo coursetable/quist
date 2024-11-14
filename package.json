@@ -1,6 +1,6 @@
 {
   "name": "quist",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Queries, fast, simple, robust.",
   "license": "MIT",
   "type": "module",

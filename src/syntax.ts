@@ -144,20 +144,22 @@ const tokenRegex = new RegExp(
   'gu',
 );
 
+const idRegex = /[^\s(),:=<>!:]+/u;
+
 const booleanOpRegex = new RegExp(
-  `^(${booleanOperators.join('|')}):([\\w-]+)$`,
+  `^(${booleanOperators.join('|')}):(${idRegex.source})$`,
   'u',
 );
 
-const setOpRegex = new RegExp(`^([\\w-]+):(${setOperators.join('|')})$`, 'u');
+const setOpRegex = new RegExp(`^(${idRegex.source}):(${setOperators.join('|')})$`, 'u');
 
 const categoricalOpRegex = new RegExp(
-  `^([\\w-]+):(${categoricalOperators.join('|')})$`,
+  `^(${idRegex.source}):(${categoricalOperators.join('|')})$`,
   'u',
 );
 
 const textOpRegex = new RegExp(
-  `^([\\w-]+|\\*):(${textOperators.join('|')})`,
+  `^(${idRegex.source}):(${textOperators.join('|')})`,
   'u',
 );
 
